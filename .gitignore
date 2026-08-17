@@ -1,0 +1,37 @@
+# Configuracion privada de cada equipo
+tools/local_config.ps1
+CMakeUserPresets.json
+.vscode/launch.json
+
+# Salidas de CMake y Ninja
+/build/
+/Build/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+build.ninja
+.ninja_deps
+.ninja_log
+
+# Binarios y archivos derivados
+*.o
+*.obj
+*.d
+*.elf
+*.bin
+*.hex
+*.map
+*.lst
+*.a
+
+# Archivos generados por GD32 Embedded Builder
+objects.list
+sources.mk
+subdir.mk
+
+# Temporales
+*.tmp
+*.bak
+*~
+.DS_Store
+Thumbs.db

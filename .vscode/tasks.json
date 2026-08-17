@@ -1,0 +1,82 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "1. Verificar entorno GD32",
+      "type": "process",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/tools/verify_environment.ps1"
+      ],
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": []
+    },
+    {
+      "label": "6. Preparar depuracion",
+      "type": "process",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/tools/create_debug_config.ps1"
+      ],
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": []
+    },
+    {
+      "label": "2. Configurar CMake (Debug)",
+      "type": "process",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/tools/configure.ps1",
+        "-BuildType",
+        "Debug"
+      ],
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": []
+    },
+    {
+      "label": "3. Compilar GD32 (Debug)",
+      "type": "process",
+      "command": "cmake",
+      "args": ["--build", "--preset", "build-debug"],
+      "dependsOrder": "sequence",
+      "dependsOn": ["2. Configurar CMake (Debug)"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": [],
+      "group": { "kind": "build", "isDefault": true }
+    },
+    {
+      "label": "4. Programar GD32 (Debug)",
+      "type": "process",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/tools/flash.ps1",
+        "-BuildType",
+        "Debug"
+      ],
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": []
+    },
+    {
+      "label": "5. Compilar y programar GD32",
+      "dependsOrder": "sequence",
+      "dependsOn": ["3. Compilar GD32 (Debug)", "4. Programar GD32 (Debug)"],
+      "problemMatcher": []
+    }
+  ]
+}

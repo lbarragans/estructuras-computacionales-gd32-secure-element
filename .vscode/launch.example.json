@@ -1,0 +1,33 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug GD32VW553 - Secure Element",
+      "type": "cortex-debug",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "executable": "${workspaceFolder}/build/debug/GD32VW55x.elf",
+      "servertype": "openocd",
+      "serverpath": "C:/path/to/OpenOCD/bin/openocd.exe",
+      "gdbPath": "C:/path/to/NucleiRISCVGCC/bin/riscv-nuclei-elf-gdb.exe",
+      "objdumpPath": "C:/path/to/NucleiRISCVGCC/bin/riscv-nuclei-elf-objdump.exe",
+      "toolchainPrefix": "riscv-nuclei-elf",
+      "searchDir": ["C:/path/to/OpenOCD/scripts"],
+      "configFiles": ["interface/cmsis-dap.cfg"],
+      "openOCDLaunchCommands": [
+        "transport select jtag",
+        "adapter speed 100",
+        "source [find target/gd32vw55x.cfg]"
+      ],
+      "overrideLaunchCommands": [
+        "monitor reset halt",
+        "load",
+        "monitor reset halt"
+      ],
+      "overrideResetCommands": ["monitor reset halt"],
+      "runToEntryPoint": "main",
+      "preLaunchTask": "3. Compilar GD32 (Debug)",
+      "showDevDebugOutput": "raw"
+    }
+  ]
+}

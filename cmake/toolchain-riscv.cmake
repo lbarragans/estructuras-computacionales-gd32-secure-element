@@ -1,0 +1,48 @@
+set(CMAKE_SYSTEM_NAME Generic)
+set(CMAKE_SYSTEM_PROCESSOR riscv)
+set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
+
+set(NUCLEI_TOOLCHAIN_DIR "" CACHE PATH
+    "Directorio que contiene riscv-nuclei-elf-gcc")
+
+if(NOT NUCLEI_TOOLCHAIN_DIR AND DEFINED ENV{NUCLEI_TOOLCHAIN_DIR})
+    file(TO_CMAKE_PATH "$ENV{NUCLEI_TOOLCHAIN_DIR}" NUCLEI_TOOLCHAIN_DIR)
+endif()
+
+if(NUCLEI_TOOLCHAIN_DIR)
+    find_program(RISCV_GCC
+        NAMES riscv-nuclei-elf-gcc.exe riscv-nuclei-elf-gcc
+        PATHS "${NUCLEI_TOOLCHAIN_DIR}"
+        NO_DEFAULT_PATH)
+else()
+    find_program(RISCV_GCC
+        NAMES riscv-nuclei-elf-gcc.exe riscv-nuclei-elf-gcc)
+endif()
+
+if(NOT RISCV_GCC)
+    message(FATAL_ERROR
+        "No se encontro riscv-nuclei-elf-gcc.\n"
+        "Configure NUCLEI_TOOLCHAIN_DIR en tools/local_config.ps1.")
+endif()
+
+get_filename_component(TOOLCHAIN_BIN_DIR "${RISCV_GCC}" DIRECTORY)
+if(CMAKE_HOST_WIN32)
+    set(EXE_SUFFIX ".exe")
+else()
+    set(EXE_SUFFIX "")
+endif()
+
+set(TOOL_PREFIX "${TOOLCHAIN_BIN_DIR}/riscv-nuclei-elf")
+set(CMAKE_C_COMPILER "${TOOL_PREFIX}-gcc${EXE_SUFFIX}" CACHE FILEPATH "" FORCE)
+set(CMAKE_ASM_COMPILER "${TOOL_PREFIX}-gcc${EXE_SUFFIX}" CACHE FILEPATH "" FORCE)
+set(CMAKE_AR "${TOOL_PREFIX}-ar${EXE_SUFFIX}" CACHE FILEPATH "" FORCE)
+set(CMAKE_RANLIB "${TOOL_PREFIX}-ranlib${EXE_SUFFIX}" CACHE FILEPATH "" FORCE)
+set(CMAKE_OBJCOPY "${TOOL_PREFIX}-objcopy${EXE_SUFFIX}" CACHE FILEPATH "" FORCE)
+set(CMAKE_OBJDUMP "${TOOL_PREFIX}-objdump${EXE_SUFFIX}" CACHE FILEPATH "" FORCE)
+set(CMAKE_SIZE "${TOOL_PREFIX}-size${EXE_SUFFIX}" CACHE FILEPATH "" FORCE)
+
+set(CMAKE_FIND_ROOT_PATH "${TOOLCHAIN_BIN_DIR}/..")
+set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
