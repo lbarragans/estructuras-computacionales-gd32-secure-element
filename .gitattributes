@@ -1,0 +1,8 @@
+* text=auto
+*.c text eol=lf
+*.h text eol=lf
+*.S text eol=lf linguist-language=Assembly
+*.md text eol=lf
+*.ps1 linguist-detectable=false
+CMakeLists.txt linguist-detectable=false
+*.cmake linguist-detectable=false

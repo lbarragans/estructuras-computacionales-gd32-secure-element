@@ -1,89 +1,65 @@
-# Ejercicio 11 — Autenticación challenge–response en GD32VW553
+# Ejercicio 11 - Secure Element y challenge-response
 
-**Autora:** Laura Daniela Barragán Silva  
-**Plataforma:** GD32VW553HMQ6/HMQ7, RISC-V RV32  
-**Entorno:** Visual Studio Code, CMake, Ninja, Nuclei GCC/GDB y OpenOCD
+**Curso:** Estructuras Computacionales
 
-## Propósito
+**Autora:** Laura Daniela Barragan Silva
 
-Este laboratorio simula un elemento seguro inspirado en dispositivos como el
-ATECC608. El microcontrolador ejecuta cinco pruebas de autenticación con
-HMAC-SHA256 y permite observar cómo se aceptan credenciales válidas y se
-rechazan alteraciones y repeticiones.
+**Plataforma:** GD32VW553HMQ6/HMQ7, RISC-V RV32
 
-> Este proyecto es didáctico. La clave está incluida en el firmware y puede
-> extraerse; por tanto, **no ofrece la protección física de un ATECC608 real**.
-> Tampoco implementa criptografía de curva elíptica ni toda su API.
+## Objetivo
 
-## Flujo de autenticación
+Simular autenticacion challenge-response con HMAC-SHA256, comparar el MAC sin
+salidas tempranas y rechazar la repeticion de un challenge ya aceptado.
 
-```mermaid
-sequenceDiagram
-    participant V as Verificador
-    participant S as Elemento seguro simulado
-    V->>S: challenge nuevo (32 bytes)
-    S->>S: HMAC-SHA256(clave, challenge)
-    S-->>V: response (32 bytes)
-    V->>V: recalcula HMAC y compara
-    alt MAC correcto y challenge nuevo
-        V-->>S: autenticación aceptada
-    else MAC incorrecto o challenge repetido
-        V-->>S: autenticación rechazada
-    end
-```
+> Es una practica didactica. La clave está dentro del firmware y puede
+> extraerse. No sustituye la proteccion fisica ni la API de un ATECC608 real.
 
-## Pruebas automáticas
+## Tres caminos
 
-| Paso | Prueba | Resultado esperado |
+| Camino | Archivos | Concepto |
+|---|---|---|
+| Referencia | `Src/main.c`, `Src/secure_element_sim.c`, `Src/sha256.c` | simulador y HMAC-SHA256 en C |
+| RISC-V puro | `Ensamblador_RISCV_Puro/main.S` | guion, comparacion y HMAC fijo en Assembly |
+| FreeRTOS puro | `FreeRTOS_Puro/main.c` | tarea de autenticacion y Queue de resultados |
+
+La referencia continúa seleccionada por el CMake principal. Las alternativas
+son independientes y no se compilan simultaneamente con `Src/main.c`.
+
+## Cinco pruebas
+
+| Paso | Prueba | Resultado |
 |---:|---|---|
-| 0 | Challenge y respuesta válidos | Aceptada |
-| 1 | Challenge alterado con respuesta anterior | MAC rechazado |
-| 2 | Respuesta alterada en tránsito | MAC rechazado |
-| 3 | Segundo challenge válido | Aceptada |
-| 4 | Repetición del par válido anterior | Replay rechazado |
+| 0 | challenge y respuesta validos | aceptada |
+| 1 | challenge alterado, respuesta anterior | MAC rechazado |
+| 2 | respuesta alterada | MAC rechazado |
+| 3 | segundo par valido | aceptada |
+| 4 | repeticion del par anterior | replay rechazado |
 
-El LED PC13 muestra dos destellos cortos para una aceptación y uno largo para
-un rechazo. La validación precisa se realiza con el depurador.
+Al terminar un ciclo se esperan dos aceptaciones, tres rechazos, dos fallas
+MAC, un replay y tres respuestas calculadas. PC13 muestra dos pulsos cortos por
+aceptacion y uno largo por rechazo.
 
-## Uso desde VS Code
-
-1. Copie `tools/local_config.example.ps1` como `tools/local_config.ps1` y
-   configure las tres rutas locales.
-2. Abra esta carpeta como raíz en VS Code y confíe en ella.
-3. Use `Terminal > Run Task`:
-   - `1. Verificar entorno GD32`
-   - `6. Preparar depuración`
-   - `5. Compilar y programar GD32`
-4. Abra *Run and Debug*, seleccione
-   `Debug GD32VW553 - Secure Element` e inicie la sesión.
-
-## Valores esperados al completar un ciclo
-
-Detenga el programa en `g_sequence_cycles++;`:
+## Estructura
 
 ```text
-g_authentication_accepted                 = 2
-g_authentication_rejected                 = 3
-g_expected_mac_failures                   = 2
-g_expected_replays                        = 1
-g_secure_element.commands_executed        = 3
-g_auth_verifier.verification_attempts     = 5
-g_auth_verifier.accepted                  = 2
-g_auth_verifier.rejected_mac              = 2
-g_auth_verifier.rejected_replay           = 1
+11_Secure_Element_Challenge_Response/
+├── Src/                         # referencia original
+├── Inc/
+├── Ensamblador_RISCV_Puro/      # aplicacion criptografica RV32
+├── FreeRTOS_Puro/               # tareas y Queue de resultados
+├── Doc/
+├── CMakeLists.txt
+└── README.md
 ```
 
-## Documentación
+Los documentos originales `Doc/1_SETUP.md` a `Doc/8_GLOSSARY.md` permanecen.
+Las rutas se comparan en `Doc/6_VARIANTES_DEL_EJERCICIO.md` y se verifican con
+`Doc/7_PLAN_DE_VALIDACION.md`.
 
-- [Preparación](Doc/1_SETUP.md)
-- [Compilación y programación](Doc/2_BUILD_AND_FLASH.md)
-- [Conceptos y preguntas](Doc/3_CONCEPTS_AND_QUESTIONS.md)
-- [Depuración](Doc/4_DEBUGGING.md)
-- [Solución de problemas](Doc/5_TROUBLESHOOTING.md)
-- [Laboratorio guiado](Doc/6_GUIDED_LAB.md)
-- [Recorrido del código](Doc/7_CODE_WALKTHROUGH.md)
-- [Glosario](Doc/8_GLOSSARY.md)
+## Estado
 
-El SDK oficial, el compilador y OpenOCD son dependencias externas y no se
-incluyen en el repositorio. `build/`, `tools/local_config.ps1` y
-`.vscode/launch.json` también se excluyen porque son archivos locales.
+| Implementacion | Estado |
+|---|---|
+| Referencia C | funcional y seleccionada por CMake |
+| Assembly puro | fuente pedagogica lista; integracion y vectores pendientes |
+| FreeRTOS puro | fuente lista; kernel, port e integracion pendientes |
