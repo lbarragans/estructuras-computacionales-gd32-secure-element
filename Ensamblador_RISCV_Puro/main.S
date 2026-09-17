@@ -60,7 +60,7 @@ main:
     not t2, t2
     and t1, t1, t2
     sw t1, 0(t0)
-    li t0, GPIOC_BOP
+    li t0, GPIOC_BC
     li t1, PC13_BIT
     sw t1, 0(t0)
 
@@ -147,7 +147,7 @@ main:
     la t0, g_indicator_deadline
     add t1, s0, t1
     sw t1, 0(t0)
-    li t0, GPIOC_BC
+    li t0, GPIOC_BOP
     li t1, PC13_BIT
     sw t1, 0(t0)
 
@@ -349,7 +349,7 @@ indicator_update:
     blt t4, zero, .Lind_return
     li t3, 1
     bne t1, t3, .Lind_off_state
-    li t3, GPIOC_BOP
+    li t3, GPIOC_BC
     li t4, PC13_BIT
     sw t4, 0(t3)
     la t3, g_indicator_pulses
@@ -363,7 +363,7 @@ indicator_update:
     sw t4, 0(t2)
     ret
 .Lind_off_state:
-    li t3, GPIOC_BC
+    li t3, GPIOC_BOP
     li t4, PC13_BIT
     sw t4, 0(t3)
     li t1, 1

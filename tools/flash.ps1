@@ -32,8 +32,10 @@ $ProgramCommand = "program {$ElfForOpenOcd} verify reset exit"
 & $OpenOcdExe `
     -s $OpenOcdScripts `
     -f "interface/cmsis-dap.cfg" `
+    -c "cmsis_dap_backend usb_bulk" `
+    -c "cmsis_dap_vid_pid 0x1a86 0x8012" `
     -c "transport select jtag" `
-    -c "adapter speed 100" `
+    -c "adapter speed 50" `
     -f "target/gd32vw55x.cfg" `
     -c $ProgramCommand
 

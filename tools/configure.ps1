@@ -1,7 +1,10 @@
 [CmdletBinding()]
 param(
     [ValidateSet("Debug", "Release")]
-    [string]$BuildType = "Debug"
+    [string]$BuildType = "Debug",
+
+    [ValidateSet("original", "assembly")]
+    [string]$Variant = "original"
 )
 
 $ErrorActionPreference = "Stop"
@@ -46,7 +49,8 @@ try {
     & cmake `
         --preset $Preset `
         "-DGD32_SDK_ROOT=$GD32_SDK_ROOT" `
-        "-DNUCLEI_TOOLCHAIN_DIR=$NUCLEI_TOOLCHAIN_DIR"
+        "-DNUCLEI_TOOLCHAIN_DIR=$NUCLEI_TOOLCHAIN_DIR" `
+        "-DAPP_VARIANT=$Variant"
 
     if ($LASTEXITCODE -ne 0) {
         throw "CMake fallo con codigo $LASTEXITCODE."

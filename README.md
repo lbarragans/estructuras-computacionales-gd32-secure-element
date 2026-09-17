@@ -60,6 +60,41 @@ Las rutas se comparan en `Doc/6_VARIANTES_DEL_EJERCICIO.md` y se verifican con
 
 | Implementacion | Estado |
 |---|---|
-| Referencia C | funcional y seleccionada por CMake |
-| Assembly puro | fuente pedagogica lista; integracion y vectores pendientes |
-| FreeRTOS puro | fuente lista; kernel, port e integracion pendientes |
+| Referencia C | compilada, grabada y validada fisicamente en GD32VW553 |
+| Assembly puro | compilada, grabada y validada fisicamente en GD32VW553 |
+| FreeRTOS puro | compilada con MSDK V1.0.3g, grabada y validada fisicamente |
+
+## Ejecutar las variantes
+
+Referencia original por JTAG/OpenOCD:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\\tools\\build_variant.ps1 -Variant original -Flash
+```
+
+Assembly puro por JTAG/OpenOCD:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\\tools\\build_variant.ps1 -Variant assembly -Flash
+```
+
+FreeRTOS usa el port oficial del SDK WiFi V1.0.3g. Desde VS Code seleccione
+**Terminal > Run Task > Build + Flash FreeRTOS**. La tarea copia `main.c`,
+`app_cfg.h`, `sha256.c` y `sha256.h`, limpia el build compartido, compila
+MBL/MSDK y programa `image-all.bin`.
+
+La programacion usa WCH-Link CMSIS-DAP v2 mediante USB bulk, VID:PID
+`1A86:8012` y JTAG a 50 kHz.
+
+## Patron visual esperado
+
+- Dos pulsos cortos: autenticacion aceptada.
+- Un pulso largo: rechazo por MAC o replay.
+- Por ciclo: dos aceptaciones y tres rechazos, seguidos por una pausa.
+
+Las tres variantes reprodujeron este patron en la placa real con WCH-Link.
+
+## Guía central de ejecución
+
+La [guía central GD32VW553](https://github.com/lbarragans/gd32vw553-vscode-cmake-guide)
+documenta instalación, conexión, compilación y validación de las variantes.

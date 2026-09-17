@@ -1,4 +1,8 @@
 #include <stdint.h>
+
+#include "app_cfg.h"
+#include "gd32vw55x_platform.h"
+#include "wrapper_os.h"
 #include <string.h>
 
 #include "FreeRTOS.h"
@@ -136,8 +140,8 @@ static void authentication_task(void *argument)
 
 static void led_set(uint8_t on)
 {
-    if (on != 0U) gpio_bit_reset(LED_GPIO_PORT, LED_GPIO_PIN);
-    else gpio_bit_set(LED_GPIO_PORT, LED_GPIO_PIN);
+    if (on != 0U) gpio_bit_set(LED_GPIO_PORT, LED_GPIO_PIN);
+    else gpio_bit_reset(LED_GPIO_PORT, LED_GPIO_PIN);
 }
 
 static void indicator_task(void *argument)
@@ -161,6 +165,11 @@ static void indicator_task(void *argument)
 
 int main(void)
 {
+    BaseType_t authentication_ok;
+    BaseType_t indicator_ok;
+
+    sys_os_init();
+    platform_init();
     rcu_periph_clock_enable(LED_GPIO_CLOCK);
     gpio_mode_set(LED_GPIO_PORT, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, LED_GPIO_PIN);
     gpio_output_options_set(LED_GPIO_PORT, GPIO_OTYPE_PP,
@@ -172,10 +181,14 @@ int main(void)
     result_queue = xQueueCreate(8U, sizeof(uint8_t));
     if (result_queue == NULL) for (;;) { }
 
-    (void)xTaskCreate(authentication_task, "Auth", configMINIMAL_STACK_SIZE * 3U,
-                      NULL, tskIDLE_PRIORITY + 2U, NULL);
-    (void)xTaskCreate(indicator_task, "LED", configMINIMAL_STACK_SIZE,
-                      NULL, tskIDLE_PRIORITY + 1U, NULL);
-    vTaskStartScheduler();
+    authentication_ok = xTaskCreate(authentication_task, "Auth",
+                                    configMINIMAL_STACK_SIZE * 3U, NULL,
+                                    tskIDLE_PRIORITY + 2U, NULL);
+    indicator_ok = xTaskCreate(indicator_task, "LED",
+                               configMINIMAL_STACK_SIZE, NULL,
+                               tskIDLE_PRIORITY + 1U, NULL);
+    if ((authentication_ok != pdPASS) || (indicator_ok != pdPASS))
+        for (;;) { }
+    sys_os_start();
     for (;;) { }
 }

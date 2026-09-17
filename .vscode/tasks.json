@@ -77,6 +77,30 @@
       "dependsOrder": "sequence",
       "dependsOn": ["3. Compilar GD32 (Debug)", "4. Programar GD32 (Debug)"],
       "problemMatcher": []
+    },
+    {
+      "label": "Build + Flash Original",
+      "type": "process",
+      "command": "powershell",
+      "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "${workspaceFolder}/tools/build_variant.ps1", "-Variant", "original", "-Flash"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Build + Flash Assembly",
+      "type": "process",
+      "command": "powershell",
+      "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "${workspaceFolder}/tools/build_variant.ps1", "-Variant", "assembly", "-Flash"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Build + Flash FreeRTOS",
+      "type": "process",
+      "command": "powershell",
+      "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "${workspaceFolder}/tools/build_freertos.ps1", "-Clean", "-Flash"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": []
     }
   ]
 }

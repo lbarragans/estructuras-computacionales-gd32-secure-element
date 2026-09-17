@@ -1,5 +1,11 @@
 # 7. Plan de validacion
 
+## Validacion fisica completada
+
+Las variantes original, Assembly puro y FreeRTOS se compilaron, grabaron y
+ejecutaron correctamente en la placa GD32VW553 mediante WCH-Link CMSIS-DAP v2.
+Las tres reprodujeron el patron visual y los resultados indicados abajo.
+
 ## Resultado por ciclo
 
 - 2 autenticaciones aceptadas;
@@ -25,6 +31,9 @@ rechazo de replay en el `.lst`.
 
 Integrar kernel, port, heap, configuracion y `Src/sha256.c`. Confirmar Queue de
 resultados, cinco pasos ordenados y las metricas esperadas.
+
+Resultado observado: ejecucion ordenada de las cinco pruebas, con dos
+aceptaciones y tres rechazos por ciclo.
 
 ## Limite de seguridad
 

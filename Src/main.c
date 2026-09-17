@@ -86,16 +86,16 @@ static uint8_t time_reached(
  * Controla el LED de PC13.
  *
  * En esta placa el LED es activo en nivel bajo:
- *   0 lógico -> LED encendido
- *   1 lógico -> LED apagado
+ *   1 lógico -> LED encendido
+ *   0 lógico -> LED apagado
  */
 static void led_set(uint8_t turn_on)
 {
     if (turn_on != 0U) {
-        gpio_bit_reset(LED_GPIO_PORT, LED_GPIO_PIN);
+        gpio_bit_set(LED_GPIO_PORT, LED_GPIO_PIN);
         g_led_is_on = 1U;
     } else {
-        gpio_bit_set(LED_GPIO_PORT, LED_GPIO_PIN);
+        gpio_bit_reset(LED_GPIO_PORT, LED_GPIO_PIN);
         g_led_is_on = 0U;
     }
 }
